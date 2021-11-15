@@ -28,7 +28,50 @@ season_18_19 = organise_data("18_19_revised.csv")
 def allocate_points_and_goaldiff(data, season):
   None
 def construct_table(dict):
-  None
+    points= {}
+    for i in dict.keys():
+        points[i]=dict[i][4]
+    ls = points.values(); ls = list(ls);ls.sort(reverse=True)
+    ranked_dict = {} 
+    for i in ls: 
+        for p in points:
+            if i == points[p]:
+                ranked_dict[p]=i
+    equal_points = []
+    for i in ranked_dict.keys():
+        n = 0    
+        for p in ls:
+            if ranked_dict[i]==p:
+                n+=1
+        if n >=2:
+            equal_points.append(i)
+    if equal_points == []:
+        return(ranked_dict)
+    else:
+        print("Warning: There are "+str(len(equal_points))+" teams that share the same amount of points with at least one other team")
+        goal_diff = {}
+        for i in equal_points:
+            goal_diff[i] = dict2[i][5]
+        gd = list(goal_diff.values())
+        gd.sort(reverse=True)
+        w_gd ={}
+        for i in gd: 
+            for p in goal_diff:
+                if i == goal_diff[p]:
+                    w_gd[p]=i
+        n=0
+        for i in w_gd:
+            ranked_dict[i]+=n
+            n-=0.01
+        ls = ranked_dict.values(); ls = list(ls);ls.sort(reverse=True)
+        new_ranked_dict={}
+        for i in ls: 
+            for p in ranked_dict:
+                if i == ranked_dict[p]:
+                    new_ranked_dict[p]=i
+        for i in new_ranked_dict: 
+            new_ranked_dict[i]=dict[i]
+        return(new_ranked_dict)
 
 def visualise_table():
 	None
