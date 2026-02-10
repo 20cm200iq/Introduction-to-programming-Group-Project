@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statsbudsjettet 2025 – Norges inntekter og utgifter</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+    <!-- Top summary bar -->
+    <header class="summary-bar">
+        <div class="summary-bar-inner">
+            <div class="site-title">
+                <h1>Statsbudsjettet <span class="year">2025</span></h1>
+                <p class="subtitle">Norges inntekter og utgifter – utforsk budsjettet lag for lag</p>
+            </div>
+            <div class="summary-figures">
+                <div class="figure income-figure">
+                    <span class="figure-label">Inntekter</span>
+                    <span class="figure-value" id="summary-income">2 250 mrd kr</span>
+                </div>
+                <div class="figure balance-figure" id="summary-balance-box">
+                    <span class="figure-label">Overskudd</span>
+                    <span class="figure-value positive" id="summary-balance">+229 mrd kr</span>
+                </div>
+                <div class="figure expense-figure">
+                    <span class="figure-label">Utgifter</span>
+                    <span class="figure-value" id="summary-expense">2 021 mrd kr</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Controls bar -->
+    <nav class="controls-bar">
+        <div class="controls-inner">
+            <div class="breadcrumbs" id="breadcrumbs">
+                <span class="crumb active" data-path="root">Hele budsjettet</span>
+            </div>
+            <div class="display-toggle">
+                <button class="toggle-btn active" data-mode="nok" title="Vis beløp i milliarder kroner">Mrd kr</button>
+                <button class="toggle-btn" data-mode="percent" title="Vis som andel av totalen">Prosent</button>
+                <button class="toggle-btn" data-mode="percapita" title="Vis beløp per innbygger">Per innbygger</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main content: dual treemap -->
+    <main class="main-content">
+        <div class="treemap-container">
+            <div class="treemap-panel income-panel">
+                <div class="panel-header">
+                    <h2 class="panel-title income-title">Inntekter</h2>
+                    <span class="panel-total" id="income-total">2 250 mrd kr</span>
+                </div>
+                <div class="treemap" id="treemap-income"></div>
+            </div>
+            <div class="treemap-panel expense-panel">
+                <div class="panel-header">
+                    <h2 class="panel-title expense-title">Utgifter</h2>
+                    <span class="panel-total" id="expense-total">2 021 mrd kr</span>
+                </div>
+                <div class="treemap" id="treemap-expense"></div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Detail panel (appears when drilling down) -->
+    <div class="detail-overlay" id="detail-overlay">
+        <div class="detail-panel" id="detail-panel">
+            <button class="detail-close" id="detail-close">&times;</button>
+            <div class="detail-header">
+                <h2 class="detail-title" id="detail-title"></h2>
+                <span class="detail-amount" id="detail-amount"></span>
+            </div>
+            <p class="detail-description" id="detail-description"></p>
+            <div class="detail-treemap" id="detail-treemap"></div>
+            <div class="detail-list" id="detail-list"></div>
+        </div>
+    </div>
+
+    <!-- Tooltip -->
+    <div class="tooltip" id="tooltip"></div>
+
+    <!-- Info footer -->
+    <footer class="info-footer">
+        <div class="footer-inner">
+            <p class="source">Kilde: <a href="https://www.regjeringen.no/no/statsbudsjett/2025/" target="_blank">Prop. 1 S (2024–2025) Statsbudsjettet</a> – Gul bok. Tall ekskl. lånetransaksjoner.</p>
+            <p class="note">Klikk på et felt for å utforske underkategoriene. Noen underposter er estimater.</p>
+        </div>
+    </footer>
+
+    <script src="js/data.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
