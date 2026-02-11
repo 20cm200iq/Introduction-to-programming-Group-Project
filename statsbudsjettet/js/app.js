@@ -121,13 +121,17 @@
 
             const hasChildren = originalData.children && originalData.children.length > 0;
 
+            const iconHtml = originalData.icon ? `<div class="cell-icon">${originalData.icon}</div>` : '';
+            const hasChanges = !!originalData.endringer;
+
             cell.innerHTML = `
                 <div class="cell-content">
                     <div>
+                        ${iconHtml}
                         <div class="cell-name">${originalData.name}</div>
                     </div>
                     <div class="cell-value">${formatValue(originalData.value, total)}</div>
-                    ${hasChildren ? '<div class="cell-expand">Utforsk &rarr;</div>' : ''}
+                    ${hasChildren || hasChanges ? '<div class="cell-expand">Utforsk &rarr;</div>' : ''}
                 </div>
             `;
 
@@ -138,7 +142,7 @@
 
             // Click to drill down
             cell.addEventListener("click", () => {
-                if (hasChildren) {
+                if (hasChildren || hasChanges) {
                     openDetail(originalData, total, side, color);
                 }
             });
@@ -152,14 +156,17 @@
 
     function showTooltip(e, data, total, side) {
         const hasChildren = data.children && data.children.length > 0;
+        const hasChanges = !!data.endringer;
+        const clickable = hasChildren || hasChanges;
+        const iconPrefix = data.icon ? data.icon + ' ' : '';
         tooltip.innerHTML = `
-            <div class="tooltip-name">${data.name}</div>
+            <div class="tooltip-name">${iconPrefix}${data.name}</div>
             <div class="tooltip-value">
                 ${formatFullValue(data.value)} · ${formatPercent(data.value, total)} av ${side === "income" ? "inntektene" : "utgiftene"}
                 <br>${formatPerCapita(data.value)} per innbygger
             </div>
             ${data.description ? `<div class="tooltip-desc">${data.description}</div>` : ""}
-            ${hasChildren ? '<div class="tooltip-hint">Klikk for å utforske underkategorier</div>' : ""}
+            ${clickable ? '<div class="tooltip-hint">Klikk for \u00e5 utforske' + (hasChanges ? ' endringer og ' : '') + (hasChildren ? 'underkategorier' : '') + '</div>' : ""}
         `;
         tooltip.classList.add("visible");
         moveTooltip(e);
@@ -187,14 +194,34 @@
     function openDetail(data, parentTotal, side, parentColor) {
         hideTooltip();
 
-        document.getElementById("detail-title").textContent = data.name;
+        const titleEl = document.getElementById("detail-title");
+        titleEl.innerHTML = (data.icon ? `<span class="detail-icon">${data.icon}</span>` : '') + data.name;
         document.getElementById("detail-amount").textContent = formatFullValue(data.value);
         document.getElementById("detail-description").textContent = data.description || "";
 
         const detailTreemap = document.getElementById("detail-treemap");
         const detailList = document.getElementById("detail-list");
+        const detailChanges = document.getElementById("detail-changes");
         detailTreemap.innerHTML = "";
         detailList.innerHTML = "";
+        detailChanges.innerHTML = "";
+        detailTreemap.style.display = "";
+        detailChanges.style.display = "none";
+
+        // Render "De viktigste endringene" if available
+        if (data.endringer) {
+            detailChanges.style.display = "block";
+            const e = data.endringer;
+            detailChanges.innerHTML = `
+                <div class="changes-header">
+                    <span class="changes-title">De viktigste endringene</span>
+                    <span class="changes-badge">${e.verdi}</span>
+                </div>
+                <ul class="changes-list">
+                    ${e.punkter.map(p => `<li>${p}</li>`).join('')}
+                </ul>
+            `;
+        }
 
         if (data.children && data.children.length > 0) {
             const children = [...data.children].sort((a, b) => b.value - a.value);
@@ -280,6 +307,11 @@
         } else {
             detailTreemap.style.display = "none";
             overlay.classList.add("visible");
+        }
+
+        // If no children, still show the panel for endringer
+        if (!data.children || data.children.length === 0) {
+            detailTreemap.style.display = "none";
         }
 
         // Update breadcrumbs
